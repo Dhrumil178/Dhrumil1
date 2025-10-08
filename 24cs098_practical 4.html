@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dynamic Content Portal</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+
+    <!-- Notification Banner -->
+    <div id="notification" class="popup">
+      🔔 New Update Available! <button id="closePopup">Close</button>
+    </div>
+
+    <h1>FAQs Section</h1>
+    <div class="faq">
+      <button class="question">What is JavaScript?</button>
+      <div class="answer">JavaScript is a scripting language used to create dynamic content on web pages.</div>
+
+      <button class="question">What is the DOM?</button>
+      <div class="answer">DOM stands for Document Object Model. It allows JS to interact with HTML elements.</div>
+    </div>
+
+    <h2>Image Slider</h2>
+    <div class="slider">
+      <!-- Set the initial image to match your JS array and folder -->
+      <img id="sliderImage" src="images/reyna.jpg" alt="My Image">
+      <div class="controls">
+        <button onclick="prevSlide()">⬅</button>
+        <button onclick="nextSlide()">➡</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
