@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Registration</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      padding: 20px;
+    }
+    .container {
+      max-width: 400px;
+      background: #fff;
+      margin: auto;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin: 10px 0 5px;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .error {
+      color: red;
+      font-size: 0.9em;
+      margin-bottom: 10px;
+    }
+    #strengthMsg {
+      font-size: 0.9em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>User Registration</h2>
+    <form id="registrationForm" novalidate>
+      
+      <label for="name">Full Name</label>
+      <input type="text" id="name" name="name" required>
+      <div class="error" id="nameError"></div>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required>
+      <div class="error" id="emailError"></div>
+
+      <label for="phone">Phone Number</label>
+      <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required>
+      <div class="error" id="phoneError"></div>
+
+      <label for="dob">Date of Birth</label>
+      <input type="date" id="dob" name="dob" required>
+      <div class="error" id="dobError"></div>
+
+      <label for="gender">Gender</label>
+      <select id="gender" name="gender" required>
+        <option value="">--Select--</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+      </select>
+      <div class="error" id="genderError"></div>
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required>
+      <div id="strengthMsg"></div>
+      <div class="error" id="passwordError"></div>
+
+      <label for="confirmPassword">Confirm Password</label>
+      <input type="password" id="confirmPassword" name="confirmPassword" required>
+      <div class="error" id="confirmPasswordError"></div>
+
+      <button type="submit">Register</button>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('registrationForm');
+
+    const name = document.getElementById('name');
+    const email = document.getElementById('email');
+    const phone = document.getElementById('phone');
+    const dob = document.getElementById('dob');
+    const gender = document.getElementById('gender');
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirmPassword');
+    const strengthMsg = document.getElementById('strengthMsg');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      let valid = true;
+
+      // Clear errors
+      document.querySelectorAll('.error').forEach(el => el.textContent = '');
+
+      // Name validation
+      if (name.value.trim().length < 3) {
+        document.getElementById('nameError').textContent = "Name must be at least 3 characters.";
+        valid = false;
+      }
+
+      // Email validation
+      if (!email.checkValidity()) {
+        document.getElementById('emailError').textContent = "Enter a valid email.";
+        valid = false;
+      }
+
+      // Phone validation
+      if (!phone.checkValidity()) {
+        document.getElementById('phoneError').textContent = "Enter a 10-digit phone number.";
+        valid = false;
+      }
+
+      // DOB validation
+      if (!dob.value) {
+        document.getElementById('dobError').textContent = "Please select your date of birth.";
+        valid = false;
+      }
+
+      // Gender validation
+      if (!gender.value) {
+        document.getElementById('genderError').textContent = "Please select your gender.";
+        valid = false;
+      }
+
+      // Password validation
+      if (password.value.length < 6) {
+        document.getElementById('passwordError').textContent = "Password must be at least 6 characters.";
+        valid = false;
+      }
+
+      // Confirm password validation
+      if (password.value !== confirmPassword.value) {
+        document.getElementById('confirmPasswordError').textContent = "Passwords do not match.";
+        valid = false;
+      }
+
+      if (valid) {
+        alert("Registration successful!");
+        form.reset();
+        strengthMsg.textContent = "";
+      }
+    });
+
+    password.addEventListener('input', () => {
+  const val = password.value;
+  let strength = 0;
+
+  if (val.length >= 6) strength++;
+  if (/[A-Z]/.test(val)) strength++;
+  if (/[0-9]/.test(val)) strength++;
+  if (/[^A-Za-z0-9]/.test(val)) strength++;
+
+  const messages = ["Weak", "Medium", "Strong", "Very Strong"];
+  const colors = ["red", "orange", "blue", "green"];
+
+  if (strength > 0) {
+    strengthMsg.textContent = "Password Strength: " + messages[strength - 1];
+    strengthMsg.style.color = colors[strength - 1];
+  } else {
+    strengthMsg.textContent = "";
+  }
+});
+  </script>
+</body>
+</html>
