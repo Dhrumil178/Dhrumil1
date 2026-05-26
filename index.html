@@ -1,128 +1,68 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Registration - Practical 6</title>
-  <style>
-    :root {
-      --bg: #f4f7fb;
-      --card: #ffffff;
-      --accent: #3b82f6;
-      --muted: #6b7280;
-      --danger: #dc2626;
-    }
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-      background: var(--bg);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      min-height:100vh;
-      padding:20px;
-    }
-    .container{
-      width:100%;
-      max-width:520px;
-      background:var(--card);
-      padding:26px;
-      border-radius:12px;
-      box-shadow: 0 8px 22px rgba(0,0,0,0.06);
-    }
-    h1{ margin:0 0 8px; font-size:22px; }
-    .lead{ margin:0 0 16px; color:var(--muted); }
-    .grid{ display:grid; gap:12px; grid-template-columns: 1fr 1fr; }
-    label{ display:block; font-size:13px; margin-bottom:6px; color:#111827; }
-    input[type="text"], input[type="email"], input[type="password"], input[type="tel"]{
-      width:100%;
-      padding:10px;
-      border-radius:8px;
-      border:1px solid #e5e7eb;
-      font-size:14px;
-      box-sizing:border-box;
-    }
-    .full { grid-column: 1 / -1; }
-    .actions{ margin-top:14px; display:flex; gap:10px; align-items:center; }
-    .btn{
-      background:var(--accent);
-      color:white;
-      border:none;
-      padding:10px 14px;
-      border-radius:10px;
-      cursor:pointer;
-      font-size:15px;
-    }
-    .small{ font-size:13px; color:var(--muted); }
-    .error{ color:var(--danger); margin-top:8px; font-size:13px; display:none; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Detection Web App</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- ml5.js Library -->
+    <script defer src="https://unpkg.com/ml5@0.12.0/dist/ml5.min.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>Registration</h1>
-    <p class="lead">Fill the form and press Submit. Fields marked with * are required.</p>
+    <div class="container">
+        <header>
+            <h1>🎥 Face Detection Web App</h1>
+            <p>Real-time face detection from your webcam</p>
+        </header>
 
-    <form id="regForm" action="Practical_6.php" method="post" novalidate>
-      <div class="grid">
-        <div>
-          <label for="fullname">Full name *</label>
-          <input id="fullname" name="fullname" type="text" required maxlength="100" placeholder="Your full name">
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="webcam">🎥 Webcam</button>
+            <button class="tab-btn" data-tab="upload">📸 Upload Photo</button>
         </div>
 
-        <div>
-          <label for="username">Username *</label>
-          <input id="username" name="username" type="text" required maxlength="50" placeholder="Choose a username">
+        <div id="webcam-tab" class="tab-content active">
+            <div class="controls">
+                <button id="startBtn" class="btn btn-primary">Start Webcam</button>
+                <button id="stopBtn" class="btn btn-danger" disabled>Stop Webcam</button>
+                <span id="status" class="status">Ready</span>
+            </div>
         </div>
 
-        <div>
-          <label for="email">Email *</label>
-          <input id="email" name="email" type="email" required maxlength="150" placeholder="you@example.com">
+        <div id="upload-tab" class="tab-content">
+            <div class="upload-area" id="uploadArea">
+                <input type="file" id="imageInput" accept="image/*" style="display:none;">
+                <div class="upload-placeholder">
+                    <div class="upload-icon">📤</div>
+                    <p>Click to upload or drag & drop an image</p>
+                    <small>Supported: JPG, PNG, GIF, WebP</small>
+                </div>
+            </div>
+            <button id="clearImageBtn" class="btn btn-danger" style="display:none; margin-top: 15px;">Clear Image</button>
         </div>
 
-        <div>
-          <label for="phone">Phone</label>
-          <input id="phone" name="phone" type="tel" pattern="[0-9]{10}" maxlength="10" placeholder="10 digit phone (optional)">
+        <div class="video-container">
+            <video id="video" autoplay muted playsinline></video>
+            <canvas id="canvas"></canvas>
         </div>
 
-        <div class="full">
-          <label for="password">Password *</label>
-          <input id="password" name="password" type="password" required minlength="6" placeholder="At least 6 characters">
+        <div class="info-panel">
+            <div class="info-item">
+                <span class="label">Faces Detected:</span>
+                <span id="faceCount" class="value">0</span>
+            </div>
+            <div class="info-item">
+                <span class="label">FPS:</span>
+                <span id="fps" class="value">0</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Model Status:</span>
+                <span id="modelStatus" class="value">Loading...</span>
+            </div>
         </div>
 
-        <div class="full">
-          <label for="confirm_password">Confirm password *</label>
-          <input id="confirm_password" name="confirm_password" type="password" required minlength="6" placeholder="Repeat password">
-        </div>
-      </div>
+        <div class="detection-details" id="detectionDetails"></div>
+    </div>
 
-      <div class="actions">
-        <button class="btn" type="submit">Submit</button>
-        <span class="small">We store your details in a server file (CSV).</span>
-      </div>
-
-      <p id="formError" class="error" aria-live="polite"></p>
-    </form>
-  </div>
-
-  <script>
-    // small client-side check: make sure passwords match
-    const form = document.getElementById('regForm');
-    const pwd = document.getElementById('password');
-    const cpwd = document.getElementById('confirm_password');
-    const formError = document.getElementById('formError');
-
-    form.addEventListener('submit', function(e){
-      formError.style.display = 'none';
-      if (pwd.value !== cpwd.value) {
-        e.preventDefault();
-        formError.textContent = 'Passwords do not match.';
-        formError.style.display = 'block';
-        cpwd.focus();
-        return false;
-      }
-      // Let the browser perform the other native checks (required, email)
-    });
-  </script>
+    <script src="script.js"></script>
 </body>
 </html>
-
